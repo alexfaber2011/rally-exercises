@@ -69,18 +69,41 @@
         width (count (get matrix 0))]
     (->> (for [row (range height)]
            (for [col (range width)]
-                     (when (toggle-cell? matrix row col)
-                       [row col])))
+             (when (toggle-cell? matrix row col)
+               [row col])))
          flatten
          (remove nil?)
-         (partition 2))))
+         (partition 2)
+         (mapv vec))))
 
-()
+(defn exists-in?
+  [seq elem]
+  (some #(= elem %) seq))
+
+(defn toggle-cell
+  "turns a 1 into a 0 and an 0 into a 1"
+  [cell]
+  (if (= cell 0) 1 0))
+
+(defn rebuild-cells
+  "takes a list of coordinates to toggle, and returns a vector of vectors that results after an iteration
+   of the game logic is applied."
+  [matrix cell-cords-to-toggle]
+  (let [height (count matrix)
+        width (count (get matrix 0))]
+    (->> (for [row (range height)]
+           (for [col (range width)]
+             (let [cell (get-in matrix [row col])]
+               (if (exists-in? cell-cords-to-toggle [row col])
+                 (toggle-cell cell)
+                 cell))))
+         (mapv vec))))
 
 (defn evolve
   [input]
   (let [[parsed-input exception] (parse-input input)]
     (if parsed-input
-      (-> parsed-input
-          find-cells-to-toggle)
+      (->> parsed-input
+           find-cells-to-toggle
+           (rebuild-cells parsed-input))
       (str "Unable to parse gameboard. " (.getMessage exception)))))
