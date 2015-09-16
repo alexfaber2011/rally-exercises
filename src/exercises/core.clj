@@ -1,39 +1,6 @@
 (ns exercises.core
   (:gen-class))
 
-(def test-matrix [[0 1 0 0 0]
-                  [1 0 0 1 1]
-                  [1 1 0 0 1]
-                  [0 1 0 0 0]
-                  [1 0 0 0 1]])
-
-(defn parse-lines
-  "takes a vector of strings of numbers and returns a 2d vector containing only integers"
-  [vec-of-strings]
-  (vec (for [line vec-of-strings]
-         (vec (for [char line]
-                (-> (str char)
-                    Integer/parseInt))))))
-
-(defn parse-repl-input
-  "takes repl input in the form of:
-
-    01000
-    10011
-    11001
-    01000
-    10001
-
-   and turns it into a vector of vectors of integers"
-  [input]
-  (try
-    (let [parsed-lines (->> input
-                            clojure.string/split-lines
-                            (mapv clojure.string/trim)
-                            parse-lines)]
-      [parsed-lines nil])
-    (catch Exception e [nil e])))
-
 (defn get-neighbors
   "returns a vector of neighbors (left, down, right, up), nil prunning where necessary"
   [matrix row col]
