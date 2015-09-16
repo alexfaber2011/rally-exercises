@@ -19,7 +19,38 @@
          vec)))
 
 (defn get-neighbor-count
-  "retuns an integer representing the number of 1's in the neighborhood"
+  "returns an integer representing the number of 1's in the neighborhood"
   [neighbors]
   (reduce + neighbors))
 
+(defn parse-lines
+  "takes a vector of strings of numbers and returns a 2d vector containing only integers"
+  [vec-of-strings]
+  (vec (for [line vec-of-strings]
+         (vec (for [char line]
+                (-> (str char)
+                    Integer/parseInt))))))
+
+(defn parse-input
+  "takes repl input in the form of:
+
+    01000
+    10011
+    11001
+    01000
+    10001
+
+   and turns it into a vector of vectors of integers"
+  [input]
+  (try
+    (->> input
+         clojure.string/split-lines
+         (mapv clojure.string/trim)
+         parse-lines)
+    (catch Exception e (throw e))))
+
+(defn evolve
+  [input]
+  (try
+    (parse-input input)
+    (catch Exception e (str "Unable to parse gameboard. " (.getMessage e)))))
