@@ -14,7 +14,7 @@
         down (get-in matrix [(dec row) col])
         right (get-in matrix [row (inc col)])
         up (get-in matrix [(inc row) col])]
-    (->> (list left down right up)
+    (->> [left down right up]
          (remove nil?)
          vec)))
 
