@@ -15,7 +15,7 @@
                 (-> (str char)
                     Integer/parseInt))))))
 
-(defn parse-input
+(defn parse-repl-input
   "takes repl input in the form of:
 
     01000
@@ -100,10 +100,57 @@
          (mapv vec))))
 
 (defn evolve
-  [input]
-  (let [[parsed-input exception] (parse-input input)]
-    (if parsed-input
-      (->> parsed-input
-           find-cells-to-toggle
-           (rebuild-cells parsed-input))
-      (str "Unable to parse gameboard. " (.getMessage exception)))))
+  [matrix]
+  (->> matrix
+       find-cells-to-toggle
+       (rebuild-cells matrix)))
+
+(defn get-gameboard-from-user
+  []
+  (flush)
+  (loop [input (read-line)
+         result []]
+    (if (.contains input "d")
+      result
+      (recur (read-line) (conj result input)))))
+
+(defn parse-input
+  [gameboard-lines]
+  (letfn [(char-to-int [char]
+                       (-> char
+                           str
+                           Integer/parseInt))]
+    (-> (for [line gameboard-lines]
+          (mapv char-to-int line))
+        vec)))
+
+(defn print-gameboard
+  [matrix header]
+  (println (str "\n\n<== " header " ===>"))
+  (doseq [line matrix]
+    (doseq [cell line]
+      (print cell))
+    (print "\n"))
+  (println (str "<== " header " ===>"))
+  matrix)
+
+(defn -main
+  [& args]
+  (println "Welcome, Rally, to the game of Life
+
+Gameboard input will take the following form:
+
+  01000
+  10011
+  11001
+  01000
+  10001
+
+type \"d\" on a new line when done adding lines
+
+Note: no validation is performed on your input, so only input 0, 1, and newline\n")
+  (-> (get-gameboard-from-user)
+      parse-input
+      (print-gameboard "original")
+      evolve
+      (print-gameboard "result")))
